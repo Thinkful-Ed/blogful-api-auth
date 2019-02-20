@@ -44,6 +44,7 @@ describe('Comments Endpoints', function() {
       }
       return supertest(app)
         .post('/api/comments')
+        .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
         .send(newComment)
         .expect(201)
         .expect(res => {
@@ -89,6 +90,7 @@ describe('Comments Endpoints', function() {
 
         return supertest(app)
           .post('/api/comments')
+          .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
           .send(newComment)
           .expect(400, {
             error: `Missing '${field}' in request body`,
