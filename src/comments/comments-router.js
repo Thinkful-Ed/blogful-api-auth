@@ -1,7 +1,7 @@
 const express = require('express')
 const path = require('path')
 const CommentsService = require('./comments-service')
-const { requireAuth } = require('../middleware/basic-auth')
+const { requireAuth } = require('../middleware/jwt-auth')
 
 const commentsRouter = express.Router()
 const jsonBodyParser = express.json()
