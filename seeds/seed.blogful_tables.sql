@@ -9,6 +9,8 @@ VALUES
   (5, 'lexlor', 'Alex Taylor', 'Lex', 'lex-password'),
   (6, 'wippy', 'Ping Won In', 'Ping', 'ping-password');
 
+ALTER SEQUENCE blogful_users_id_seq RESTART WITH 7;
+
 INSERT INTO blogful_articles (id, title, style, author_id, content)
 VALUES
   (1, 'First post!', 'Interview', 1,
@@ -31,6 +33,8 @@ VALUES
     'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dignissimos architecto repellat, in amet soluta exercitationem perferendis eius perspiciatis praesentium voluptate nisi deleniti eaque? Rerum ea quisquam dolore, non error earum?'),
   (10, 'Tenth post', 'How-to', 4,
     'Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum molestiae accusamus veniam consectetur tempora, corporis obcaecati ad nisi asperiores tenetur, autem magnam. Iste, architecto obcaecati tenetur quidem voluptatum ipsa quam?');
+
+ALTER SEQUENCE blogful_articles_id_seq RESTART WITH 11;
 
 INSERT INTO blogful_comments (
   id,
@@ -158,5 +162,7 @@ INSERT INTO blogful_comments (
     8,
     4
   );
+
+ALTER SEQUENCE blogful_comments_id_seq RESTART WITH 21;
 
 COMMIT;
