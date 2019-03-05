@@ -53,16 +53,18 @@ const ArticlesService = {
         'comm.text',
         'comm.date_created',
         db.raw(
-          `row_to_json(
-            (SELECT tmp FROM (
-              SELECT
-                usr.id,
-                usr.user_name,
-                usr.full_name,
-                usr.nickname,
-                usr.date_created,
-                usr.date_modified
-            ) tmp)
+          `json_strip_nulls(
+            row_to_json(
+              (SELECT tmp FROM (
+                SELECT
+                  usr.id,
+                  usr.user_name,
+                  usr.full_name,
+                  usr.nickname,
+                  usr.date_created,
+                  usr.date_modified
+              ) tmp)
+            )
           ) AS "user"`
         )
       )
@@ -76,24 +78,40 @@ const ArticlesService = {
   },
 
   serializeArticle(article) {
+    const { author } = article
     return {
       id: article.id,
       style: article.style,
       title: xss(article.title),
       content: xss(article.content),
-      date_created: article.date_created,
-      author: article.author || {},
+      date_created: new Date(article.date_created),
       number_of_comments: Number(article.number_of_comments) || 0,
+      author: {
+        id: author.id,
+        user_name: author.user_name,
+        full_name: author.full_name,
+        nickname: author.nickname,
+        date_created: new Date(author.date_created),
+        date_modified: new Date(author.date_modified) || null
+      },
     }
   },
 
   serializeArticleComment(comment) {
+    const { user } = comment
     return {
       id: comment.id,
       article_id: comment.article_id,
       text: xss(comment.text),
-      user: comment.user || {},
-      date_created: comment.date_created,
+      date_created: new Date(comment.date_created),
+      user: {
+        id: user.id,
+        user_name: user.user_name,
+        full_name: user.full_name,
+        nickname: user.nickname,
+        date_created: new Date(user.date_created),
+        date_modified: new Date(user.date_modified) || null
+      },
     }
   },
 }
