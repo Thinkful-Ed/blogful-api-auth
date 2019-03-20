@@ -203,27 +203,52 @@ function makeArticlesFixtures() {
 }
 
 function cleanTables(db) {
-  return db.raw(
-    `TRUNCATE
-      blogful_articles,
-      blogful_users,
-      blogful_comments
-      RESTART IDENTITY CASCADE`
+  return db.transaction(trx =>
+    trx.raw(
+      `TRUNCATE
+        blogful_articles,
+        blogful_users,
+        blogful_comments
+      `
+    )
+    .then(() =>
+      Promise.all([
+        trx.raw(`ALTER SEQUENCE blogful_articles_id_seq minvalue 0 START WITH 1`),
+        trx.raw(`ALTER SEQUENCE blogful_users_id_seq minvalue 0 START WITH 1`),
+        trx.raw(`ALTER SEQUENCE blogful_comments_id_seq minvalue 0 START WITH 1`),
+        trx.raw(`SELECT setval('blogful_articles_id_seq', 0)`),
+        trx.raw(`SELECT setval('blogful_users_id_seq', 0)`),
+        trx.raw(`SELECT setval('blogful_comments_id_seq', 0)`),
+      ])
+    )
   )
 }
 
 function seedArticlesTables(db, users, articles, comments=[]) {
-  return db
-    .into('blogful_users')
-    .insert(users)
-    .then(() =>
-      db
-        .into('blogful_articles')
-        .insert(articles)
-    )
-    .then(() =>
-      comments.length && db.into('blogful_comments').insert(comments)
-    )
+  // use a transaction to group the queries and auto rollback on any failure
+  return db.transaction(async trx => {
+    await trx.into('blogful_users').insert(users)
+    await trx.into('blogful_articles').insert(articles)
+    // update the auto sequence to match the forced id values
+    await Promise.all([
+      trx.raw(
+        `SELECT setval('blogful_users_id_seq', ?)`,
+        [users[users.length - 1].id],
+      ),
+      trx.raw(
+        `SELECT setval('blogful_articles_id_seq', ?)`,
+        [articles[articles.length - 1].id],
+      ),
+    ])
+    // only insert comments if there are some, also update the sequence counter
+    if (comments.length) {
+      await trx.into('blogful_comments').insert(comments)
+      await trx.raw(
+        `SELECT setval('blogful_comments_id_seq', ?)`,
+        [comments[comments.length - 1].id],
+      )
+    }
+  })
 }
 
 function seedMaliciousArticle(db, user, article) {
