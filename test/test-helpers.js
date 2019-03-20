@@ -264,7 +264,7 @@ function seedMaliciousArticle(db, user, article) {
 
 function makeAuthHeader(user) {
   const token = Buffer.from(`${user.user_name}:${user.password}`).toString('base64')
-  return `Bearer ${token}`
+  return `Basic ${token}`
 }
 
 module.exports = {
