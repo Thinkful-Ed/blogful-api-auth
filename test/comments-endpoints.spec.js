@@ -1,6 +1,7 @@
 const knex = require('knex')
 const app = require('../src/app')
 const helpers = require('./test-helpers')
+const config = require('../src/config');
 
 describe('Comments Endpoints', function() {
   let db
@@ -13,7 +14,7 @@ describe('Comments Endpoints', function() {
   before('make knex instance', () => {
     db = knex({
       client: 'pg',
-      connection: process.env.TEST_DB_URL,
+      connection: config.TEST_DB_URL,
     })
     app.set('db', db)
   })
