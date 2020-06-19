@@ -54,16 +54,13 @@ const ArticlesService = {
         'comm.date_created',
         db.raw(
           `json_strip_nulls(
-            row_to_json(
-              (SELECT tmp FROM (
-                SELECT
-                  usr.id,
-                  usr.user_name,
-                  usr.full_name,
-                  usr.nickname,
-                  usr.date_created,
-                  usr.date_modified
-              ) tmp)
+            json_build_object(
+              'id', usr.id,
+              'user_name', usr.user_name,
+              'full_name', usr.full_name,
+              'nickname', usr.nickname,
+              'date_created', usr.date_created,
+              'date_modified', usr.date_modified
             )
           ) AS "user"`
         )
